@@ -125,8 +125,6 @@ class AppController(TCPServer):
         msg["color_box_dict"] = self.app_settings.colors.color_box_dict
         msg["color_text_dict"] = self.app_settings.colors.color_text_dict
         msg["color_point"] = self.app_settings.colors.color_point
-
-
         self.send_command(msg)
 
     def play(self):

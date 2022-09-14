@@ -262,7 +262,7 @@ class RunSettings:
                  train_cycles=10, train_trials=5,
                  test_cycles=10,
                  cvep_model_path='',
-                 fps_resolution=60):
+                 fps_resolution=120):
         self.user = user
         self.session = session
         self.run = run
@@ -333,7 +333,7 @@ class Colors:
                 color_text_dict[str(unique_sequence_values[i])] = init_hex
             else:
                 color_text_dict[str(unique_sequence_values[i])] = end_hex
-        return color_text_dict, color_box_dict
+        return color_box_dict, color_box_dict
 
     @staticmethod
     def concat_dict(dict_):

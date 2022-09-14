@@ -107,7 +107,9 @@ class App(resources.AppSkeleton):
             cvep_model=None,
             spell_result=[],
             fps_resolution=self.app_settings.run_settings.fps_resolution,
-            spell_target=target_
+            spell_target=target_,
+            resize_onset=np.zeros((0,)),
+            resize_info=[]
         )
 
     def handle_exception(self, ex):
@@ -327,6 +329,8 @@ class App(resources.AppSkeleton):
         elif dict_event["event_type"] == "processPlease":
             # Unity is requesting MEDUSA to process the previous trial
             self.process_required = True
+        elif dict_event["event_type"] == "resize":
+            self.append_resize_info(dict_event)
         else:
             print(self.TAG, 'Unknown event_type %s' % dict_event["event_type"])
 
@@ -418,7 +422,7 @@ class App(resources.AppSkeleton):
         times_, signal_ = lsl_worker.get_data()
         if times_.shape[0] != signal_.shape[0]:
             min_len = min(times_.shape[0], signal_.shape[0])
-            print('[get_current_recording] Warning! timestamps (%i) and '
+            print('[get_eeg_data] Warning! timestamps (%i) and '
                   'signal (%i) did not have the same dimensions, trimmed '
                   'both to have %i samples.' % (times_.shape[0],
                                                 signal_.shape[0],
@@ -482,6 +486,13 @@ class App(resources.AppSkeleton):
         if "command_idx" in msg:
             self.cvep_data.command_idx = np.append(
                 self.cvep_data.command_idx, msg["command_idx"])
+
+    def append_resize_info(self, msg):
+        self.cvep_data.resize_onset = np.append(
+            self.cvep_data.resize_onset, msg["resize_onset"]
+        )
+        self.cvep_data.resize_info.append({'screen_size': msg["screen_size"],
+                                           'new_position': msg["new_position"]})
 
     def process_trial(self):
         """ This function processes only the last trial to get the selected

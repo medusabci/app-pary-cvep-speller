@@ -136,39 +136,6 @@ class Config(QtWidgets.QDialog, ui_main_file):
         else:
             self.train_test_box.setCurrentIndex(0)
 
-    def on_seqlen_changed(self):
-        mseqlen = int(self.comboBox_seqlength.currentText())
-
-        # Compute parameters
-        if mseqlen == 31:
-            order = 5
-            seed = [1 for i in range(order)]
-            poly_ = LFSR_PRIMITIVE_POLYNOMIALS['base'][2]['order'][5]
-        elif mseqlen == 63:
-            order = 6
-            seed = [1, 1, 1, 1, 1, 0]
-            poly_ = LFSR_PRIMITIVE_POLYNOMIALS['base'][2]['order'][6]
-        elif mseqlen == 127:
-            order = 7
-            seed = [1 for i in range(order)]
-            poly_ = LFSR_PRIMITIVE_POLYNOMIALS['base'][2]['order'][7]
-        elif mseqlen == 255:
-            order = 8
-            seed = [1 for i in range(order)]
-            poly_ = LFSR_PRIMITIVE_POLYNOMIALS['base'][2]['order'][8]
-        else:
-            raise ValueError('[cvep_speller/settings] Sequence length of %i '
-                             'not supported (use 31, 63, 127 or 255)!' %
-                             mseqlen)
-        cycle_dur = mseqlen / float(self.spinBox_fpsresolution.value())
-
-        # Update things
-        self.lineEdit_poly.setText(str(poly_))
-        self.lineEdit_base.setText(str(2))
-        self.lineEdit_order.setText(str(order))
-        self.lineEdit_seed.setText(str(seed))
-        self.lineEdit_cycleduration.setText(str(cycle_dur))
-
     def set_settings_to_gui(self):
         # Run settings
         self.lineEdit_user.setText(self.settings.run_settings.user)
@@ -774,6 +741,7 @@ class Config(QtWidgets.QDialog, ui_main_file):
                            " command(s) %s is not minimum!" % ','.join(
                     visualize_dialog.bad_cmds)
                 warning_dialog(warn_msg, 'Be careful!')
+        print(lags_info)
 
     # --------------------- Colors ------------------------
     def open_color_dialog(self, handle):
