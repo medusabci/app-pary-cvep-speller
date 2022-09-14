@@ -112,6 +112,9 @@ class App(resources.AppSkeleton):
             resize_info=[]
         )
 
+        # Debugging?
+        self.is_debugging = False
+
     def handle_exception(self, ex):
         if not isinstance(ex, exceptions.MedusaException):
             raise ValueError('Unhandled exception')
@@ -166,9 +169,6 @@ class App(resources.AppSkeleton):
                     "desired sequence" %
                     app_settings.run_settings.cvep_model_path)
 
-
-
-
     def get_eeg_worker_name(self, working_lsl_streams_info):
         for lsl_info in working_lsl_streams_info:
             if lsl_info['lsl_type'] == 'EEG':
@@ -211,13 +211,12 @@ class App(resources.AppSkeleton):
             print(TAG, 'Close signal emitted to Unity.')
 
             # Wait until the Unity server notify us that the app is closed
-            while self.app_controller.unity_state.value != UNITY_DOWN:
-                time.sleep(0.1)
+            while self.app_controller.unity_state.value != UNITY_FINISHED:
+                pass
             print(TAG, 'Unity application closed!')
 
-            # Close the main app and exit the loop
+            # Exit the loop
             self.stop = True
-            self.close_app()
 
         # Wait until MEDUSA is ready
         print(TAG, "Waiting MEDUSA to be ready...")
@@ -362,14 +361,22 @@ class App(resources.AppSkeleton):
         # execution until it is closed
         while self.app_controller.server_state.value == SERVER_DOWN:
             time.sleep(0.1)
-        try:
-            self.app_controller.start_application()
-        except Exception as ex:
-            self.handle_exception(ex)
-            self.medusa_interface.error(ex)
-        # while self.app_controller: time.sleep(1)  # For debugging Unity
-        # 5 - Check for a forced closure from Unity
-        self.check_forced_closure()
+        if self.is_debugging:
+            # When debugging
+            while self.app_controller:
+                time.sleep(1)
+        else:
+            try:
+                # Start application (blocking method)
+                self.app_controller.start_application()
+            except Exception as ex:
+                self.handle_exception(ex)
+                self.medusa_interface.error(ex)
+        # 5 - Close (only if close app has not been called yet)
+        if self.app_controller.server_state.value != SERVER_DOWN:
+            self.close_app()
+        while self.app_controller.server_state.value == SERVER_UP:
+            time.sleep(0.1)
         # 6 - Change app state to powering off
         self.medusa_interface.app_state_changed(
             mds_constants.APP_STATE_POWERING_OFF)
@@ -389,14 +396,13 @@ class App(resources.AppSkeleton):
             mds_constants.APP_STATE_OFF)
 
     def close_app(self, force=False):
-        """ Closes the ``AppController`` and working threads.
-        """
-        # Trigger the close event in the AppController. Returns True if
-        # closed correctly, and False otherwise. If everything was
-        # correct, stop the working threads
-        if self.app_controller.close():
-            self.stop_working_threads()
-        self.app_controller = None
+        """ Closes the app controller and working threads. The force parameter
+                is not required in Unity apps
+                """
+        # Trigger the close event in the AppController
+        if self.app_controller.server_state.value != SERVER_DOWN:
+            self.app_controller.close()
+        self.stop_working_threads()
 
     # ---------------------------- SAVE DATA ----------------------------
     @exceptions.error_handler(scope='app')
