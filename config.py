@@ -18,6 +18,7 @@ from matplotlib.ticker import FormatStrFormatter
 import numpy as np
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 from matplotlib.figure import Figure
+from scipy.integrate import quad
 
 # Load the .ui files
 ui_main_file = uic.loadUiType(os.path.dirname(__file__) + "/config.ui")[0]
@@ -72,6 +73,8 @@ class Config(QtWidgets.QDialog, ui_main_file):
         self.comboBox_order.currentTextChanged.connect(self.update_encoding_info)
         self.spinBox_fpsresolution.valueChanged.connect(
             self.update_encoding_info)
+        self.doubleSpinBox_es_std.valueChanged.connect(
+            self.update_es_confidence_interval)
 
         # Color buttons
         self.btn_color_background.clicked.connect(self.open_color_dialog(
@@ -95,6 +98,7 @@ class Config(QtWidgets.QDialog, ui_main_file):
 
         # Set settings to GUI
         self.set_settings_to_gui()
+        self.update_es_confidence_interval()
         self.on_base_changed()
         self.comboBox_order.setCurrentIndex(4) # default 2^6
         self.notifications.new_notification('Default settings loaded')
@@ -136,6 +140,17 @@ class Config(QtWidgets.QDialog, ui_main_file):
         else:
             self.train_test_box.setCurrentIndex(0)
 
+    def update_es_confidence_interval(self):
+        def normal_prob_density(x):
+            # Normal probability density function (PDF)
+            constant = 1.0 / np.sqrt(2 * np.pi)
+            return constant * np.exp((-x ** 2) / 2.0)
+
+        # Integrate PDF from -std to std
+        std = self.doubleSpinBox_es_std.value()
+        result, _ = quad(normal_prob_density, -std, std, limit=1000)
+        self.lineEdit_es_variance.setText(('%.2f%%' % (100 * result)))
+
     def set_settings_to_gui(self):
         # Run settings
         self.lineEdit_user.setText(self.settings.run_settings.user)
@@ -147,13 +162,16 @@ class Config(QtWidgets.QDialog, ui_main_file):
         self.spinBox_traintrials.setValue(
             self.settings.run_settings.train_trials)
         self.spinBox_testcycles.setValue(self.settings.run_settings.test_cycles)
-
         self.lineEdit_cvepmodel.setText(
             self.settings.run_settings.cvep_model_path)
         self.spinBox_fpsresolution.setValue(
             self.settings.run_settings.fps_resolution)
         self.checkBox_photodiode.setChecked(
             self.settings.run_settings.enable_photodiode)
+        if self.settings.run_settings.early_stopping is not None:
+            self.checkBox_es.setChecked(True)
+            self.doubleSpinBox_es_std.setValue(
+                self.settings.run_settings.early_stopping)
 
         # Timings
         self.doubleSpinBox_t_prev_text.setValue(
@@ -278,7 +296,7 @@ class Config(QtWidgets.QDialog, ui_main_file):
             new_layout = QGridLayout()
             new_layout.setContentsMargins(0, 0, 0, 0)
             new_layout.setSpacing(10)
-            new_layout.setMargin(10)
+            new_layout.setContentsMargins(10, 10, 10, 10)
             # Add buttons as commands
             for r in range(curr_mtx.n_row):
                 for c in range(curr_mtx.n_col):
@@ -364,7 +382,7 @@ class Config(QtWidgets.QDialog, ui_main_file):
             new_layout = QGridLayout()
             new_layout.setContentsMargins(0, 0, 0, 0)
             new_layout.setSpacing(10)
-            new_layout.setMargin(10)
+            new_layout.setContentsMargins(10, 10, 10, 10)
             # Add buttons as commands
             for r in range(curr_mtx.n_row):
                 for c in range(curr_mtx.n_col):
@@ -466,6 +484,11 @@ class Config(QtWidgets.QDialog, ui_main_file):
         self.settings.run_settings.cvep_model_path = self.lineEdit_cvepmodel.text()
         self.settings.run_settings.fps_resolution = self.spinBox_fpsresolution.value()
         self.settings.run_settings.enable_photodiode = self.checkBox_photodiode.isChecked()
+        if self.checkBox_es.isChecked():
+            self.settings.run_settings.early_stopping = \
+                self.doubleSpinBox_es_std.value()
+        else:
+            self.settings.run_settings.early_stopping = None
 
         # Timings
         self.settings.timings.t_prev_text = self.doubleSpinBox_t_prev_text.value()

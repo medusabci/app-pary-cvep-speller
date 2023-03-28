@@ -1,14 +1,13 @@
 ﻿// MEDUSA-PLATFORM 
-// v2022.0 CHAOS
+// v2023.0 GAIA
 // www.medusabci.com
 
 // MessageInterpreter for the p-ary c-VEP Speller (Unity app)
 //      > Author: Víctor Martínez-Cagigal
-//      > Date: 06/07/2022
 
 // Versions:
 //      - v1.0 (06/07/2022):    Initial message interpreter for p-ary sequences
-
+//      - v2.0 (28/03/2023):    Early stopping included in test
 
 using System.Collections;
 using System.Collections.Generic;
@@ -44,6 +43,11 @@ public class MessageInterpreter
         return SelectionDecoder.getSelectionFromJSON(message);
     }
 
+    public List<EarlyStoppingProbsDecoder.Probs> decodeProbs(string message)
+    {
+        return EarlyStoppingProbsDecoder.getEarlyStoppingProbsFromJSON(message);
+    }
+
     /* ----------------------------------- DECODING CLASSES ------------------------------------ */
     /** Class to decode the event_type first. */
     public class EventTypeDecoder
@@ -71,6 +75,7 @@ public class MessageInterpreter
         public int trainCycles;
         public int trainTrials;
         public int testCycles;
+        public bool earlyStoppingEnabled;
         public float fpsResolution;
 
         // Timings
@@ -162,6 +167,25 @@ public class MessageInterpreter
         }
     }
 
+    public class EarlyStoppingProbsDecoder
+    {
+        public List<Probs> prob_list;
+
+        public static List<Probs> getEarlyStoppingProbsFromJSON(string jsonString)
+        {
+            EarlyStoppingProbsDecoder e = JsonConvert.DeserializeObject<EarlyStoppingProbsDecoder>(jsonString);
+            return e.prob_list;
+        }
+
+        public class Probs
+        {
+            public int n_matrix { get; set; }
+            public int n_row { get; set; }
+            public int n_col { get; set; }
+            public float prob { get; set; }
+        }
+    }
+    
     // Utility
     public static Color hexToColor(string hex)
     {

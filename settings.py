@@ -262,7 +262,8 @@ class RunSettings:
                  train_cycles=10, train_trials=5,
                  test_cycles=10,
                  cvep_model_path='',
-                 fps_resolution=120):
+                 fps_resolution=120,
+                 early_stopping=3.0):
         self.user = user
         self.session = session
         self.run = run
@@ -273,6 +274,7 @@ class RunSettings:
         self.test_cycles = test_cycles
         self.cvep_model_path = cvep_model_path
         self.fps_resolution = fps_resolution
+        self.early_stopping = early_stopping
 
 
 class Timings:
