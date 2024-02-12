@@ -1,6 +1,7 @@
-from PyQt5 import QtGui, QtWidgets, uic, QtCore
-from PyQt5.QtWidgets import QColorDialog, QToolButton, QGridLayout, QSizePolicy
-from PyQt5.QtCore import Qt
+from PySide6.QtUiTools import loadUiType
+from PySide6 import QtGui, QtWidgets, QtCore
+from PySide6.QtCore import Signal, Qt
+from PySide6.QtWidgets import QSizePolicy, QApplication
 from gui import gui_utils
 from . import settings
 import os
@@ -20,17 +21,16 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
 from matplotlib.figure import Figure
 
 # Load the .ui files
-ui_main_file = uic.loadUiType(os.path.dirname(__file__) + "/config.ui")[0]
-ui_target_file = uic.loadUiType(os.path.dirname(__file__) +
+ui_main_file = loadUiType(os.path.dirname(__file__) + "/config.ui")[0]
+ui_target_file = loadUiType(os.path.dirname(__file__) +
                                 "/config_target.ui")[0]
-ui_encoding_file = uic.loadUiType(os.path.dirname(__file__) +
+ui_encoding_file = loadUiType(os.path.dirname(__file__) +
                                 "/config_encoding.ui")[0]
-
 
 class Config(QtWidgets.QDialog, ui_main_file):
     """ This class provides graphical configuration for the app """
 
-    close_signal = QtCore.pyqtSignal(object)
+    close_signal = Signal(object)
 
     def __init__(self, sett, medusa_interface,
                  working_lsl_streams_info, theme_colors=None):
@@ -43,7 +43,7 @@ class Config(QtWidgets.QDialog, ui_main_file):
             Instance of class Settings defined in settings.py in the app
             directory
         """
-        QtWidgets.QMainWindow.__init__(self)
+        QtWidgets.QDialog.__init__(self)
         self.setWindowFlags(
             self.windowFlags() & ~Qt.WindowContextHelpButtonHint)
         self.setupUi(self)
@@ -275,15 +275,14 @@ class Config(QtWidgets.QDialog, ui_main_file):
                 fps_monitor, "color",
                 self.settings.colors.color_fps_good[:7])
             # Create a new layout for the commands
-            new_layout = QGridLayout()
-            new_layout.setContentsMargins(0, 0, 0, 0)
+            new_layout = QtWidgets.QGridLayout()
+            new_layout.setContentsMargins(10, 10, 10, 10)
             new_layout.setSpacing(10)
-            new_layout.setMargin(10)
             # Add buttons as commands
             for r in range(curr_mtx.n_row):
                 for c in range(curr_mtx.n_col):
                     key_ = curr_mtx.matrix_list[r][c].sequence[0]
-                    temp_button = QToolButton()
+                    temp_button = QtWidgets.QToolButton()
                     temp_button.setObjectName('btn_command')
                     temp_button.setText(curr_mtx.matrix_list[r][c].text)
                     temp_button.clicked.connect(self.btn_command_on_click(r, c))
@@ -361,15 +360,14 @@ class Config(QtWidgets.QDialog, ui_main_file):
                 fps_monitor, "color",
                 self.settings.colors.color_fps_good[:7])
             # Create a new layout for the commands
-            new_layout = QGridLayout()
-            new_layout.setContentsMargins(0, 0, 0, 0)
+            new_layout = QtWidgets.QGridLayout()
+            new_layout.setContentsMargins(10, 10, 10, 10)
             new_layout.setSpacing(10)
-            new_layout.setMargin(10)
             # Add buttons as commands
             for r in range(curr_mtx.n_row):
                 for c in range(curr_mtx.n_col):
                     key_ = curr_mtx.matrix_list[r][c].sequence[0]
-                    temp_button = QToolButton()
+                    temp_button = QtWidgets.QToolButton()
                     temp_button.setObjectName('btn_command')
                     temp_button.setSizePolicy(policy_max_max)
                     temp_button.setText(curr_mtx.matrix_list[r][c].text)
@@ -901,10 +899,8 @@ class VisualizeEncodingDialog(QtWidgets.QDialog, ui_encoding_file):
             self.axes_autocorr.set_ylabel('Norm. $R_{xx}$', fontsize=MEDIUM_SIZE)
             self.axes_autocorr.set_title('M-sequence autocorrelation',
                                          fontsize=MEDIUM_SIZE)
-            [tick.label.set_fontsize(SMALL_SIZE) for tick in
-             self.axes_autocorr.yaxis.get_major_ticks()]
-            [tick.label.set_fontsize(SMALL_SIZE) for tick in
-             self.axes_autocorr.xaxis.get_major_ticks()]
+            self.axes_autocorr.tick_params(axis='x', labelsize=SMALL_SIZE)
+            self.axes_autocorr.tick_params(axis='y', labelsize=SMALL_SIZE)
         pos = self.axes_autocorr.get_position()
         pos.x0 = 0.2
         pos.y0 = 0.15
@@ -923,12 +919,9 @@ class VisualizeEncodingDialog(QtWidgets.QDialog, ui_encoding_file):
             self.axes_encoding.set_title('Command encoding', fontsize=MEDIUM_SIZE)
             self.axes_encoding.set_xlabel('Sequence (samples)', fontsize=MEDIUM_SIZE)
             self.axes_encoding.set_ylabel('Commands', fontsize=MEDIUM_SIZE)
-            plt.yticks(ticks=[i for i in range(len(commands))])
             self.axes_encoding.set_yticks([i for i in range(len(commands))])
-            [tick.label.set_fontsize(SMALL_SIZE) for tick in
-             self.axes_encoding.yaxis.get_major_ticks()]
-            [tick.label.set_fontsize(SMALL_SIZE) for tick in
-             self.axes_encoding.xaxis.get_major_ticks()]
+            self.axes_encoding.tick_params(axis='x', labelsize=SMALL_SIZE)
+            self.axes_encoding.tick_params(axis='y', labelsize=SMALL_SIZE)
         pos = self.axes_encoding.get_position()
         pos.x0 = 0.2
         pos.y0 = 0.15
