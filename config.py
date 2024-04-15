@@ -1,7 +1,7 @@
 from PySide6.QtUiTools import loadUiType
 from PySide6 import QtGui, QtWidgets, QtCore
 from PySide6.QtCore import Signal, Qt
-from PySide6.QtWidgets import QSizePolicy, QApplication
+from PySide6.QtWidgets import QSizePolicy, QApplication, QColorDialog
 from gui import gui_utils
 from . import settings
 import os
@@ -751,7 +751,9 @@ class Config(QtWidgets.QDialog, ui_main_file):
 
         def set_color():
             # This function is required in order to accept passing arguments (function factory)
-            color = QColorDialog.getColor()  # Open the color dialog and get the QColor instance
+            color = QColorDialog().getColor()  # Open the color dialog and
+            # get the QColor instance
+
             if not color.isValid():
                 # For example, if the user closes the dialog
                 print("Color is not valid (%s)." % color)
