@@ -609,7 +609,7 @@ class Config(QtWidgets.QDialog, ui_main_file):
         filt = "c-VEP Files (*.cvep.bson)"
         files = QtWidgets.QFileDialog.getOpenFileNames(
             caption="Select training files",
-            directory=os.getcwd() + "/../data/",
+            dir=os.getcwd() + "/../data/",
             filter=filt)
         if files[0]:
             self.notifications.new_notification('Training model...')

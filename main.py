@@ -119,6 +119,8 @@ class App(resources.AppSkeleton):
         # Debugging?
         self.is_debugging = False
 
+        # TODO: Check if the model is valid for the online settings!!!!
+
     def handle_exception(self, ex):
         if not isinstance(ex, exceptions.MedusaException):
             raise ValueError('Unhandled exception')
