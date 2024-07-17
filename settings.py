@@ -166,7 +166,6 @@ class Settings(SerializableComponent):
                 '_abcdefghijklmnopqrstuvwxyz'
         comms *= 20
         comms_ = comms[:no_commands]
-        lags_ = list(range(no_commands))
 
         # M-sequence generation
         if base not in LFSR_PRIMITIVE_POLYNOMIALS['base']:

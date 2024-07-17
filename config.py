@@ -739,7 +739,7 @@ class Config(QtWidgets.QDialog, ui_main_file):
                            " command(s) %s is not minimum!" % ','.join(
                     visualize_dialog.bad_cmds)
                 warning_dialog(warn_msg, 'Be careful!')
-        print(lags_info)
+
 
     # --------------------- Colors ------------------------
     def open_color_dialog(self, handle):
@@ -917,6 +917,7 @@ class VisualizeEncodingDialog(QtWidgets.QDialog, ui_encoding_file):
                 commands.append(c.text)
             self.axes_encoding.imshow(big_lagged_seqs_, aspect='auto',
                                       cmap='gray_r')
+            self.axes_encoding.set_yticks(np.arange(len(commands)))
             self.axes_encoding.set_yticklabels(commands)
             self.axes_encoding.set_title('Command encoding', fontsize=MEDIUM_SIZE)
             self.axes_encoding.set_xlabel('Sequence (samples)', fontsize=MEDIUM_SIZE)
