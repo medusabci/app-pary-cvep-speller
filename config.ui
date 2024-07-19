@@ -89,8 +89,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>499</width>
-               <height>322</height>
+               <width>502</width>
+               <height>315</height>
               </rect>
              </property>
              <attribute name="label">
@@ -330,8 +330,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>499</width>
-               <height>322</height>
+               <width>502</width>
+               <height>315</height>
               </rect>
              </property>
              <attribute name="label">
@@ -400,8 +400,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>482</width>
-               <height>624</height>
+               <width>488</width>
+               <height>661</height>
               </rect>
              </property>
              <attribute name="label">
@@ -699,8 +699,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>499</width>
-               <height>322</height>
+               <width>502</width>
+               <height>315</height>
               </rect>
              </property>
              <attribute name="label">
@@ -857,8 +857,8 @@
               <rect>
                <x>0</x>
                <y>0</y>
-               <width>499</width>
-               <height>322</height>
+               <width>502</width>
+               <height>315</height>
               </rect>
              </property>
              <attribute name="label">
@@ -1040,6 +1040,13 @@
                      <string>Circular Shifting</string>
                     </property>
                    </item>
+                  </widget>
+                 </item>
+                 <item row="1" column="1">
+                  <widget class="QCheckBox" name="checkBox_calibration_art_rej">
+                   <property name="text">
+                    <string>Use artifact rejection to remove noisy calibration epochs</string>
+                   </property>
                   </widget>
                  </item>
                 </layout>
